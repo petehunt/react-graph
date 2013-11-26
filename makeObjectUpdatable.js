@@ -9,9 +9,13 @@ function makeObjectUpdatable(obj) {
   var ready = false;
 
   invariant(
-    !(newObj.update || newObj.addUpdateListener || newObj.removeUpdateListener),
+    !(newObj.update || newObj.addUpdateListener || newObj.removeUpdateListener || newObj.__setReady || newObj.isUpdatable),
     'makeObjectUpdatable(): object has a magic method name.'
   );
+
+  newObj.isUpdatable = function() {
+    return true;
+  };
 
   newObj.__setReady = function() {
     invariant(!ready, '__setReady(): object already ready');
