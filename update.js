@@ -1,10 +1,6 @@
-var copyProperties = require('./copyProperties');
 var keyOf = require('./keyOf');
 var invariant = require('./invariant');
-
-function shallowCopy(x) {
-  return copyProperties({}, x);
-}
+var shallowCopy = require('./shallowCopy');
 
 function terminalUpdate(old, update) {
   return update;
@@ -13,6 +9,7 @@ function terminalUpdate(old, update) {
 var KEY_PUSH = keyOf({__push: null});
 var KEY_UNSHIFT = keyOf({__unshift: null});
 var KEY_SPLICE = keyOf({__splice: null});
+var KEY_REPLACE = keyOf({__replace: null});
 
 function arrayUpdate(arr, spec) {
   if (!isObject(spec)) {
@@ -77,6 +74,10 @@ function objectUpdate(original, obj) {
   var updated = shallowCopy(original);
 
   for (var k in obj) {
+    if (k === KEY_REPLACE) {
+      return obj;
+    }
+
     updated[k] = update(original[k], obj[k]);
   }
 

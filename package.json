@@ -1,0 +1,19 @@
+{
+  "name": "react-data",
+  "version": "0.0.0",
+  "description": "React data structures",
+  "main": "index.js",
+  "scripts": {
+    "test": "jasmine-node index.spec.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "."
+  },
+  "keywords": [
+    "backbone",
+    "react"
+  ],
+  "author": "Pete Hunt",
+  "license": "Apache 2"
+}
