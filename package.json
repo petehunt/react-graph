@@ -6,6 +6,9 @@
   "scripts": {
     "test": "jasmine-node index.spec.js"
   },
+  "devDependencies": {
+    "jasmine-node": "~1.11.0"
+  },
   "repository": {
     "type": "git",
     "url": "."
