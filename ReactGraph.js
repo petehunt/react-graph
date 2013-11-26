@@ -77,6 +77,7 @@ function ReactGraphGraph(rawGraph, nodeTypes) {
 
 copyProperties(ReactGraphGraph.prototype, {
   _deserializeNode: function(entry) {
+    invariant(entry, '_deserializeNode(): node not found');
     return this.nodeTypes[entry.typeKey](entry.data, this);
   },
 
