@@ -4,14 +4,14 @@ var update = require('./update');
 
 var ReactGraphNodeTypeSpec = {
   getNodesByEdgeType: function(type) {
-    return this.graph.rawGraph.getNodesByEdgeType(this.getKey(), type).map(
+    return this.graph.rawGraph.getNodesByEdgeType(this.getKey(), type.typeKey).map(
       this.graph._deserializeNode,
       this.graph
     );
   },
 
   getEdgesByType: function(type) {
-    return this.graph.rawGraph.getEdgesByType(this.getKey(), type).map(
+    return this.graph.rawGraph.getEdgesByType(this.getKey(), type.typeKey).map(
       function(edge) {
         return {
           data: edge.data,
@@ -49,7 +49,7 @@ copyProperties(ReactGraphGraphMutator.prototype, {
     this.rawMutator.addEdge(
       node.getKey(),
       node2.getKey(),
-      type,
+      type.typeKey,
       order,
       data
     );
