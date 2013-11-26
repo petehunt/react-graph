@@ -109,8 +109,7 @@ describe('react-graph', function() {
       static: {
         signUp: function(graph, email, fullName) {
           graph.mutator()
-            .addNode(User({email: email, fullName: fullName}, graph))
-            .save();
+            .addNode(User({email: email, fullName: fullName}, graph));
         },
 
         getByEmail: function(graph, email) {
@@ -128,8 +127,7 @@ describe('react-graph', function() {
 
       likePage: function(page) {
         this.graph.mutator()
-          .addEdge(this, page, Liked)
-          .save();
+          .addEdge(this, page, Liked);
       },
 
       getPageTitlesLiked: function() {
@@ -143,8 +141,7 @@ describe('react-graph', function() {
       static: {
         register: function(graph, pageID, title) {
           graph.mutator()
-            .addNode(Page({pageID: pageID, title: title}, graph))
-            .save();
+            .addNode(Page({pageID: pageID, title: title}, graph));
         },
 
         getByID: function(graph, pageID) {
@@ -168,29 +165,36 @@ describe('react-graph', function() {
 
     var rawGraph = index.createGraph();
 
+    var ran = false;
+
     var heldGraph = new UpdatableHolder(
       rawGraph,
       [
         function(rawGraph) {
           var myGraph = Facebook.createGraph(rawGraph);
           User.signUp(myGraph, 'floydophone');
+          myGraph.save();
         },
         function(rawGraph) {
           var myGraph = Facebook.createGraph(rawGraph);
           Page.register(myGraph, 'page1', 'test page');
+          myGraph.save();
         },
         function(rawGraph) {
           var myGraph = Facebook.createGraph(rawGraph);
           var page = Page.getByID(myGraph, 'page1');
           User.getByEmail(myGraph, 'floydophone').likePage(page);
+          myGraph.save();
         },
         function(rawGraph) {
           var myGraph = Facebook.createGraph(rawGraph);
           expect(
             User.getByEmail(myGraph, 'floydophone').getPageTitlesLiked()
           ).toEqual(['test page']);
+          ran = true;
         }
       ]
     );
+    expect(ran).toBe(true);
   });
 });

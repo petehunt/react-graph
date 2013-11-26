@@ -8,6 +8,19 @@ var ReactGraphNodeTypeSpec = {
       this.graph._deserializeNode,
       this.graph
     );
+  },
+
+  getEdgesByType: function(type) {
+    return this.graph.rawGraph.getEdgesByType(this.getKey(), type).map(
+      function(edge) {
+        return {
+          data: edge.data,
+          order: edge.order,
+          node: this.graph.getNode(edge.key2)
+        };
+      },
+      this
+    );
   }
 };
 
@@ -59,6 +72,7 @@ copyProperties(ReactGraphGraphMutator.prototype, {
 function ReactGraphGraph(rawGraph, nodeTypes) {
   this.rawGraph = rawGraph;
   this.nodeTypes = nodeTypes;
+  this.rawMutator = rawGraph.mutator();
 }
 
 copyProperties(ReactGraphGraph.prototype, {
@@ -71,7 +85,11 @@ copyProperties(ReactGraphGraph.prototype, {
   },
 
   mutator: function() {
-    return new ReactGraphGraphMutator(this.rawGraph.mutator());
+    return new ReactGraphGraphMutator(this.rawMutator);
+  },
+
+  save: function() {
+    this.mutator().save();
   }
 });
 
