@@ -112,8 +112,9 @@ describe('react-graph', function() {
             .addNode(User({email: email, fullName: fullName}, graph))
             .save();
         },
+
         getByEmail: function(graph, email) {
-          return User(graph.getNode('user:' + email), graph);
+          return graph.getNode('user:' + email);
         }
       },
 
@@ -123,6 +124,12 @@ describe('react-graph', function() {
 
       getGreeting: function() {
         return 'Hello, ' + this.data.fullName + '!';
+      },
+
+      likePage: function(page) {
+        this.graph.mutator()
+          .addEdge(this, page, Liked)
+          .save();
       },
 
       getPageTitlesLiked: function() {
@@ -136,13 +143,17 @@ describe('react-graph', function() {
       static: {
         register: function(graph, pageID, title) {
           graph.mutator()
-            .addNode(Page({pageID: pageID, title: title}))
+            .addNode(Page({pageID: pageID, title: title}, graph))
             .save();
+        },
+
+        getByID: function(graph, pageID) {
+          return graph.getNode('page:' + pageID);
         }
       },
 
       getKey: function() {
-        return this.data.pageID;
+        return 'page:' + this.data.pageID;
       },
 
       getPageTitle: function() {
@@ -155,8 +166,31 @@ describe('react-graph', function() {
       toNodeType: Page
     });
 
-    var myGraph = Facebook.createGraph();
+    var rawGraph = index.createGraph();
 
-    User.signUp(myGraph, 'floydophone');
+    var heldGraph = new UpdatableHolder(
+      rawGraph,
+      [
+        function(rawGraph) {
+          var myGraph = Facebook.createGraph(rawGraph);
+          User.signUp(myGraph, 'floydophone');
+        },
+        function(rawGraph) {
+          var myGraph = Facebook.createGraph(rawGraph);
+          Page.register(myGraph, 'page1', 'test page');
+        },
+        function(rawGraph) {
+          var myGraph = Facebook.createGraph(rawGraph);
+          var page = Page.getByID(myGraph, 'page1');
+          User.getByEmail(myGraph, 'floydophone').likePage(page);
+        },
+        function(rawGraph) {
+          var myGraph = Facebook.createGraph(rawGraph);
+          expect(
+            User.getByEmail(myGraph, 'floydophone').getPageTitlesLiked()
+          ).toEqual(['test page']);
+        }
+      ]
+    );
   });
 });

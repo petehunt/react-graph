@@ -56,25 +56,6 @@ copyProperties(Graph.prototype, {
   mutator: function() {
     invariant(this.isUpdatable(), 'mutator(): Graph is not updatable');
     return new GraphMutator(this);
-  },
-
-  createNodeType: function(name, spec) {
-    function NodeType(key, data, graph) {
-      this.key = key;
-      this.data = data;
-      this.graph = graph;
-    }
-
-    if (spec['static']) {
-      NodeType.graph = this;
-      copyProperties(NodeType, spec['static']);
-
-      spec = update(spec, {'static': {__replace: null}});
-    }
-
-    copyProperties(NodeType.prototype, spec);
-
-    this.nodeTypes[name] = NodeType;
   }
 });
 
@@ -104,7 +85,7 @@ copyProperties(GraphMutator.prototype, {
     return this;
   },
 
-  addNode: function(key, data, type) {
+  addNode: function(key, data) {
     this.spec.nodes[key] = (
       this.updatableGraph.nodes[key] ? {__replace: data} : data
     );

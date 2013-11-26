@@ -75,7 +75,7 @@ function objectUpdate(original, obj) {
 
   for (var k in obj) {
     if (k === KEY_REPLACE) {
-      return obj;
+      return obj[k];
     }
 
     updated[k] = update(original[k], obj[k]);
