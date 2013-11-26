@@ -64,7 +64,7 @@ describe('Graph', function() {
       // mutation
       userSignup: function(email) {
         this.mutator()
-          .addNode('user:' + email, {})
+          .addNode('user:' + email, {email: email}, 'user')
           .save();
       },
 
@@ -78,6 +78,12 @@ describe('Graph', function() {
         this.mutator()
           .addEdge('user:' + email, 'page:' + pageID, 'like')
           .save();
+      }
+    }, {
+      user: {
+        sayHello: function() {
+          return 'Hello, ' + this.data.email
+        }
       }
     });
 
@@ -100,6 +106,7 @@ describe('Graph', function() {
           expect(graph.getPagesUserLikes('floydophone')).toEqual([
             'my cool page'
           ]);
+          expect(graph.getNode('user:floydophone').sayHello()).toBe('Hello, floydophone');
           done = true;
         }
       ]
