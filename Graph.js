@@ -10,14 +10,8 @@ function GraphEdge(type, key2, order, data) {
   this.data = data || null;
 }
 
-function GraphNode(type, data) {
-  this.type = type;
-  this.data = data;
-}
-
-function Graph(nodeTypes, edges, nodes) {
+function Graph(edges, nodes) {
   // edges: nodekey -> []
-  this.nodeTypes = nodeTypes;
   this.edges = edges;
   this.nodes = nodes;
 }
@@ -30,13 +24,7 @@ copyProperties(Graph.prototype, {
   },
 
   getNode: function(key) {
-    var node = this.nodes[key];
-    var nodeType = this.nodeTypes[node.type];
-    if (nodeType) {
-      return new nodeType(key, node.data, this);
-    } else {
-      return node.data;
-    }
+    return this.nodes[key];
   },
 
   getEdgesByType: function(key, type) {
@@ -117,9 +105,8 @@ copyProperties(GraphMutator.prototype, {
   },
 
   addNode: function(key, data, type) {
-    var node = new GraphNode(type || null, data);
     this.spec.nodes[key] = (
-      this.updatableGraph.nodes[key] ? {__replace: node} : node
+      this.updatableGraph.nodes[key] ? {__replace: data} : data
     );
 
     return this;
@@ -138,8 +125,8 @@ copyProperties(GraphMutator.prototype, {
   }
 });
 
-Graph.createGraph = function(mixinSpec, nodeTypes) {
-  var graph = new Graph(nodeTypes || {}, {}, {});
+Graph.createGraph = function(mixinSpec) {
+  var graph = new Graph({}, {});
   copyProperties(graph, mixinSpec || {});
   return makeObjectUpdatable(graph);
 };

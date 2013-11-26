@@ -75,26 +75,13 @@ describe('Graph', function() {
       }
     });
 
-    myGraph.createNodeType('user', {
-      static: {
-        signup: function(email) {
-          this.graph.mutator()
-            .addNode('user:' + email, {email: email}, 'user')
-            .save();
-        }
-      },
-      sayHello: function() {
-        return 'Hello, ' + this.data.email
-      }
-    });
-
     var done = false;
 
     var heldGraph = new UpdatableHolder(
       myGraph,
       [
         function(graph) {
-          graph.nodeTypes.user.signup('floydophone');
+          graph.mutator().addNode('user:floydophone', {email: 'floydophone'}).save();
         },
         function(graph) {
           graph.pageSignup('mypage', 'my cool page');
@@ -107,11 +94,69 @@ describe('Graph', function() {
           expect(graph.getPagesUserLikes('floydophone')).toEqual([
             'my cool page'
           ]);
-          expect(graph.getNode('user:floydophone').sayHello()).toBe('Hello, floydophone');
           done = true;
         }
       ]
     );
     expect(done).toBe(true);
+  });
+});
+
+describe('react-graph', function() {
+  it('should work', function() {
+    var Facebook = index.createDomain();
+    var User = Facebook.createNodeType({
+      static: {
+        signUp: function(graph, email, fullName) {
+          graph.mutator()
+            .addNode(User({email: email, fullName: fullName}, graph))
+            .save();
+        },
+        getByEmail: function(graph, email) {
+          return User(graph.getNode('user:' + email), graph);
+        }
+      },
+
+      getKey: function() {
+        return 'user:' + this.data.email;
+      },
+
+      getGreeting: function() {
+        return 'Hello, ' + this.data.fullName + '!';
+      },
+
+      getPageTitlesLiked: function() {
+        return this.getNodesByEdgeType(Liked).map(function(node) {
+          return node.getPageTitle();
+        });
+      }
+    });
+
+    var Page = Facebook.createNodeType({
+      static: {
+        register: function(graph, pageID, title) {
+          graph.mutator()
+            .addNode(Page({pageID: pageID, title: title}))
+            .save();
+        }
+      },
+
+      getKey: function() {
+        return this.data.pageID;
+      },
+
+      getPageTitle: function() {
+        return this.data.title;
+      }
+    });
+
+    var Liked = Facebook.createEdgeType({
+      fromNodeType: User,
+      toNodeType: Page
+    });
+
+    var myGraph = Facebook.createGraph();
+
+    User.signUp(myGraph, 'floydophone');
   });
 });
