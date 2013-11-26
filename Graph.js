@@ -1,6 +1,7 @@
 var copyProperties = require('./copyProperties');
 var invariant = require('./invariant');
 var makeObjectUpdatable = require('./makeObjectUpdatable');
+var update = require('./update');
 
 function GraphEdge(type, key2, order, data) {
   this.type = type;
@@ -32,13 +33,7 @@ copyProperties(Graph.prototype, {
     var node = this.nodes[key];
     var nodeType = this.nodeTypes[node.type];
     if (nodeType) {
-      var obj = {
-        graph: this,
-        key: key,
-        data: node.data
-      };
-      copyProperties(obj, nodeType);
-      return obj;
+      return new nodeType(key, node.data, this);
     } else {
       return node.data;
     }
@@ -73,6 +68,25 @@ copyProperties(Graph.prototype, {
   mutator: function() {
     invariant(this.isUpdatable(), 'mutator(): Graph is not updatable');
     return new GraphMutator(this);
+  },
+
+  createNodeType: function(name, spec) {
+    function NodeType(key, data, graph) {
+      this.key = key;
+      this.data = data;
+      this.graph = graph;
+    }
+
+    if (spec['static']) {
+      NodeType.graph = this;
+      copyProperties(NodeType, spec['static']);
+
+      spec = update(spec, {'static': {__replace: null}});
+    }
+
+    copyProperties(NodeType.prototype, spec);
+
+    this.nodeTypes[name] = NodeType;
   }
 });
 

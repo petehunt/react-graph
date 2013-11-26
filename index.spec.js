@@ -62,12 +62,6 @@ describe('Graph', function() {
       },
 
       // mutation
-      userSignup: function(email) {
-        this.mutator()
-          .addNode('user:' + email, {email: email}, 'user')
-          .save();
-      },
-
       pageSignup: function(pageID, pageName) {
         this.mutator()
           .addNode('page:' + pageID, {name: pageName})
@@ -79,11 +73,18 @@ describe('Graph', function() {
           .addEdge('user:' + email, 'page:' + pageID, 'like')
           .save();
       }
-    }, {
-      user: {
-        sayHello: function() {
-          return 'Hello, ' + this.data.email
+    });
+
+    myGraph.createNodeType('user', {
+      static: {
+        signup: function(email) {
+          this.graph.mutator()
+            .addNode('user:' + email, {email: email}, 'user')
+            .save();
         }
+      },
+      sayHello: function() {
+        return 'Hello, ' + this.data.email
       }
     });
 
@@ -93,7 +94,7 @@ describe('Graph', function() {
       myGraph,
       [
         function(graph) {
-          graph.userSignup('floydophone');
+          graph.nodeTypes.user.signup('floydophone');
         },
         function(graph) {
           graph.pageSignup('mypage', 'my cool page');
