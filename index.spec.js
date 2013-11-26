@@ -173,10 +173,6 @@ describe('react-graph', function() {
         function(rawGraph) {
           var myGraph = Facebook.createGraph(rawGraph);
           User.signUp(myGraph, 'floydophone');
-          myGraph.save();
-        },
-        function(rawGraph) {
-          var myGraph = Facebook.createGraph(rawGraph);
           Page.register(myGraph, 'page1', 'test page');
           myGraph.save();
         },
